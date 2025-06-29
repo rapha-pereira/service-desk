@@ -1,7 +1,0 @@
-{
-  "name": "service-desk",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
