@@ -16,7 +16,7 @@ async function login(req, res) {
       from usuarios
       where email = ? and senha = ?
     `;
-    const [rows] = await pool.execute(query, [email, senha]);
+    const rows = await pool.query(query, [email, senha]);
 
     if (rows.length > 0) {
       console.log("Succesfully loged in:", email);

@@ -30,7 +30,7 @@ async function getIncidents(req, res) {
     }
 
     query += " order by incidentes.data_abertura desc";
-    const [rows] = await pool.execute(query, queryParams);
+    const rows = await pool.query(query, queryParams);
     res.status(200).json(rows);
   } catch (err) {
     console.error("Incidents route error:", err);
@@ -68,7 +68,7 @@ async function createIncident(req, res) {
       descricao,
       data_previsao || null,
     ];
-    await pool.execute(query, params);
+    await pool.query(query, params);
     res.status(201).json({ message: "Incident created successfully!" });
   } catch (err) {
     console.error("Error creating incident:", err);
@@ -85,7 +85,7 @@ async function updateIncident(req, res) {
       set atendente = ?, data_previsao = ? where cod_incidente = ?
     `;
     const params = [atendente || null, data_previsao || null, id];
-    const [result] = await pool.execute(query, params);
+    const result = await pool.query(query, params);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Incident not found." });
@@ -101,7 +101,7 @@ async function deleteIncident(req, res) {
   const { id } = req.params;
   try {
     const query = "delete from incidentes where cod_incidente = ?";
-    const [result] = await pool.execute(query, [id]);
+    const result = await pool.query(query, [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Incident not found." });
