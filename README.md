@@ -76,6 +76,11 @@ The project is structured as a full-stack application with two main components:
 - GitHub Codespaces or Ubuntu environment
 
 ### 📦 Installation & Setup
+### 0. Setup a Github Codespace with this repo
+```bash
+# Into github codespace's terminal, install mariadb
+sudo apt install mariadb-server -y
+```
 
 #### 1. Database Setup
 ```bash
@@ -87,6 +92,9 @@ sudo service mariadb status
 
 # Access MariaDB console
 sudo mysql
+
+# Setup mariadb with tables like provided below
+# Remember that your database should be named "service_desk"
 ```
 
 #### 2. Backend API Setup
