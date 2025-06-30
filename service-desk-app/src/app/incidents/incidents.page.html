@@ -93,16 +93,37 @@
             <p>{{ incident.descricao }}</p>
           </div>
 
-          <div class="actions" *ngIf="!showMyIncidents && (currentUser?.nivel === 'Atendente' || currentUser?.nivel === 'Administrador')">
-            <ion-button 
-              fill="outline" 
-              size="small"
-              color="primary"
-              (click)="takeIncident(incident.cod_incidente)"
-              [disabled]="isLoading">
-              <ion-spinner *ngIf="isLoading" name="crescent" size="small"></ion-spinner>
-              <span *ngIf="!isLoading">Assumir Incidente</span>
-            </ion-button>
+          <div class="actions">
+            <!-- Botões para assumir incidente (apenas para incidentes disponíveis) -->
+            <div *ngIf="!showMyIncidents && (currentUser?.nivel === 'Atendente' || currentUser?.nivel === 'Administrador')" class="action-group">
+              <ion-button 
+                fill="outline" 
+                size="small"
+                color="primary"
+                (click)="takeIncident(incident.cod_incidente)"
+                [disabled]="isLoading">
+                <ion-spinner *ngIf="isLoading" name="crescent" size="small"></ion-spinner>
+                <span *ngIf="!isLoading">Assumir Incidente</span>
+              </ion-button>
+            </div>
+
+            <!-- Botões para editar e deletar (apenas para administradores) -->
+            <div *ngIf="currentUser?.nivel === 'Administrador'" class="action-group">
+              <ion-button 
+                fill="clear" 
+                size="small"
+                color="medium"
+                (click)="openEditModal(incident)">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button 
+                fill="clear" 
+                size="small"
+                color="danger"
+                (click)="deleteIncident(incident.cod_incidente)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
           </div>
         </ion-card-content>
       </ion-card>
@@ -119,8 +140,8 @@
     vertical="bottom" 
     horizontal="end" 
     slot="fixed"
-    *ngIf="currentUser?.nivel === 'Administrador'">
-    <ion-fab-button color="primary">
+    *ngIf="currentUser?.nivel === 'Administrador' || currentUser?.nivel === 'Atendente'">
+    <ion-fab-button color="primary" (click)="openCreateModal()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -133,4 +154,105 @@
     position="top"
     (didDismiss)="onToastDismiss()">
   </ion-toast>
+
+  <!-- Modal para criar/editar incidente -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditing ? 'Editar Incidente' : 'Novo Incidente' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <form (ngSubmit)="saveIncident()" #incidentForm="ngForm">
+          <ion-item *ngIf="!isEditing">
+            <ion-label position="stacked">ID do Usuário *</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="formData.usuario"
+              name="usuario"
+              placeholder="Digite o ID do usuário"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item *ngIf="!isEditing">
+            <ion-label position="stacked">ID do Atendente</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="formData.atendente"
+              name="atendente"
+              placeholder="Digite o ID do atendente (opcional)"
+              >
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Assunto *</ion-label>
+            <ion-input
+              [(ngModel)]="formData.assunto"
+              name="assunto"
+              placeholder="Digite o assunto do incidente"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Descrição *</ion-label>
+            <ion-textarea
+              [(ngModel)]="formData.descricao"
+              name="descricao"
+              placeholder="Descreva o incidente"
+              rows="4"
+              required>
+            </ion-textarea>
+          </ion-item>
+
+          <ion-item *ngIf="isEditing">
+            <ion-label position="stacked">ID do Atendente</ion-label>
+            <ion-input
+              type="number"
+              [(ngModel)]="formData.atendente"
+              name="atendente"
+              placeholder="Digite o ID do atendente">
+            </ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Data de Previsão</ion-label>
+            <ion-input
+              type="date"
+              [(ngModel)]="formData.data_previsao"
+              name="data_previsao">
+            </ion-input>
+          </ion-item>
+
+          <div class="modal-actions">
+            <ion-button
+              type="submit"
+              expand="block"
+              [disabled]="isLoading || !incidentForm.form.valid">
+              <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+              <ion-icon *ngIf="!isLoading" name="save-outline" slot="start"></ion-icon>
+              <span *ngIf="!isLoading">{{ isEditing ? 'Atualizar' : 'Criar' }}</span>
+            </ion-button>
+            
+            <ion-button
+              fill="clear"
+              expand="block"
+              (click)="closeModal()"
+              [disabled]="isLoading">
+              Cancelar
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
