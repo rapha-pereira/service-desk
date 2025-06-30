@@ -1,0 +1,136 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Incidentes</ion-title>
+    <ion-button
+      fill="clear"
+      slot="end"
+      (click)="onLogout()"
+      color="danger">
+      <ion-icon name="log-out-outline"></ion-icon>
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Puxe para atualizar"
+      refreshingSpinner="circles"
+      refreshingText="Atualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="header-section">
+    <div class="user-info">
+      <ion-icon name="person-outline"></ion-icon>
+      <h2>Olá, {{ currentUser?.nome }}!</h2>
+    </div>
+    
+    <ion-item class="filter-item">
+      <ion-checkbox 
+        slot="start" 
+        [(ngModel)]="showMyIncidents"
+        (ionChange)="onCheckboxChange()">
+      </ion-checkbox>
+      <ion-label>Meus incidentes</ion-label>
+    </ion-item>
+  </div>
+
+  <div class="incidents-section">
+    <div class="section-header">
+      <h3>
+        {{ showMyIncidents ? 'Meus Incidentes' : 'Incidentes Disponíveis' }}
+      </h3>
+      <ion-button 
+        fill="clear" 
+        (click)="loadIncidents()"
+        [disabled]="isLoading">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Carregando incidentes...</p>
+    </div>
+
+    <ion-list *ngIf="!isLoading">
+      <ion-card 
+        *ngFor="let incident of incidents; trackBy: trackByIncidentId" 
+        class="incident-card">
+        <ion-card-header>
+          <div class="card-header-content">
+            <ion-card-title>{{ incident.assunto }}</ion-card-title>
+            <ion-badge 
+              [color]="getStatusColor(incident.status)"
+              class="status-badge">
+              {{ incident.status }}
+            </ion-badge>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="incident-info">
+            <div class="info-row">
+              <ion-icon name="person-outline"></ion-icon>
+              <span><strong>Solicitante:</strong> {{ incident.nome_solicitante }}</span>
+            </div>
+            
+            <div class="info-row">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span><strong>Data:</strong> {{ formatDate(incident.data_abertura) }}</span>
+            </div>
+            
+            <div class="info-row">
+              <ion-icon name="ticket-outline"></ion-icon>
+              <span><strong>ID:</strong> #{{ incident.cod_incidente }}</span>
+            </div>
+          </div>
+
+          <div class="description">
+            <strong>Descrição:</strong>
+            <p>{{ incident.descricao }}</p>
+          </div>
+
+          <div class="actions" *ngIf="!showMyIncidents && (currentUser?.nivel === 'Atendente' || currentUser?.nivel === 'Administrador')">
+            <ion-button 
+              fill="outline" 
+              size="small"
+              color="primary"
+              (click)="takeIncident(incident.cod_incidente)"
+              [disabled]="isLoading">
+              <ion-spinner *ngIf="isLoading" name="crescent" size="small"></ion-spinner>
+              <span *ngIf="!isLoading">Assumir Incidente</span>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div *ngIf="incidents.length === 0" class="empty-state">
+        <ion-icon name="ticket-outline"></ion-icon>
+        <h3>Nenhum incidente encontrado</h3>
+        <p>{{ showMyIncidents ? 'Você não possui incidentes atribuídos.' : 'Não há incidentes disponíveis no momento.' }}</p>
+      </div>
+    </ion-list>
+  </div>
+
+  <ion-fab 
+    vertical="bottom" 
+    horizontal="end" 
+    slot="fixed"
+    *ngIf="currentUser?.nivel === 'Administrador'">
+    <ion-fab-button color="primary">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-toast
+    [isOpen]="showToast"
+    [message]="toastMessage"
+    [duration]="3000"
+    [color]="toastColor"
+    position="top"
+    (didDismiss)="onToastDismiss()">
+  </ion-toast>
+</ion-content>
