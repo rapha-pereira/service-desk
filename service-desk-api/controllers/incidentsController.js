@@ -56,9 +56,10 @@ async function createIncident(req, res) {
         descricao,
         data_abertura,
         data_previsao,
+        data_resolucao,
         status
       ) 
-      values (?, ?, ?, ?, CURDATE(), ?, 'Aberto')
+      values (?, ?, ?, ?, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), '0000-00-00', 'Aberto')
     `;
     // If atendente or data_previsao arent received, pass as null
     const params = [
