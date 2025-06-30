@@ -137,6 +137,16 @@
   border-top: 1px solid var(--ion-color-light-shade);
 }
 
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.action-group:last-child {
+  margin-bottom: 0;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -188,3 +198,44 @@
   }
 }
 
+/* Modal styles */
+.modal-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal-actions ion-button {
+  --border-radius: 8px;
+}
+
+/* Form styles */
+ion-modal ion-item {
+  margin-bottom: 1rem;
+  --border-radius: 8px;
+  --border-color: var(--ion-color-light-shade);
+}
+
+ion-modal ion-label {
+  font-weight: 500;
+  color: var(--ion-color-dark);
+}
+
+ion-modal ion-input,
+ion-modal ion-textarea {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+/* Action buttons in cards */
+.action-group ion-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  height: 32px;
+  width: 32px;
+}
+
+.action-group ion-button ion-icon {
+  font-size: 1.2rem;
+}
