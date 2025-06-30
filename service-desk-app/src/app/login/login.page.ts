@@ -22,6 +22,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logInOutline, personOutline, lockClosedOutline } from 'ionicons/icons';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -56,7 +57,7 @@ export class LoginPage {
   toastMessage: string = '';
   toastColor: string = 'danger';
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private authService: AuthService) {
     addIcons({ logInOutline, personOutline, lockClosedOutline });
   }
 
@@ -90,11 +91,15 @@ export class LoginPage {
         .toPromise();
 
       if (response?.status === 200) {
-        this.showToastMessage('Login realizado com sucesso!', 'success');
-        // Aguardar um pouco para mostrar a mensagem de sucesso antes de redirecionar
-        setTimeout(() => {
-          this.router.navigate(['/home']);
-        }, 1500);
+        const responseBody = response.body as any;
+        if (responseBody?.user) {
+          this.authService.setCurrentUser(responseBody.user);
+          this.showToastMessage('Login realizado com sucesso!', 'success');
+          // Aguardar um pouco para mostrar a mensagem de sucesso antes de redirecionar
+          setTimeout(() => {
+            this.router.navigate(['/incidents']);
+          }, 1500);
+        }
       }
     } catch (error: any) {
       console.error('Erro no login:', error);
